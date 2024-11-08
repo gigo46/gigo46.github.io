@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Barang Kontrakan</title>
+</head>
+<body>
+
+<h2>Form Input Barang Kontrakan</h2>
+<form action="save.php" method="POST">
+    <!-- Field tersembunyi untuk ID barang -->
+    <input type="hidden" name="id" value="<?php echo isset($_GET['id']) ? $_GET['id'] : ''; ?>">
+
+    <label for="kategori">Kategori:</label>
+    <input type="text" name="kategori" required value="<?php echo isset($_GET['kategori']) ? $_GET['kategori'] : ''; ?>"><br><br>
+
+    <label for="barang">Barang:</label>
+    <input type="text" name="barang" required value="<?php echo isset($_GET['barang']) ? $_GET['barang'] : ''; ?>"><br><br>
+
+    <label for="jumlah">Jumlah:</label>
+    <input type="number" name="jumlah" required value="<?php echo isset($_GET['jumlah']) ? $_GET['jumlah'] : ''; ?>"><br><br>
+
+    <label for="pembawa">Pembawa:</label>
+    <input type="text" name="pembawa" required value="<?php echo isset($_GET['pembawa']) ? $_GET['pembawa'] : ''; ?>"><br><br>
+
+    <button type="submit">Simpan</button>
+</form>
+
+<h2>Daftar Barang Kontrakan</h2>
+<table border="1">
+    <tr>
+        <th>Kategori</th>
+        <th>Barang</th>
+        <th>Jumlah</th>
+        <th>Pembawa</th>
+        <th>Aksi</th>
+    </tr>
+    <?php
+    // Koneksi ke database SQLite
+    $db = new PDO('sqlite:kontrakan_barang.db');
+
+    // Ambil data dari tabel kontrakan_barang
+    $query = "SELECT * FROM kontrakan_barang";
+    $result = $db->query($query);
+
+    // Tampilkan data dalam tabel HTML
+    if ($result) {
+        foreach ($result as $row) {
+            echo "<tr>
+                    <td>{$row['kategori']}</td>
+                    <td>{$row['barang']}</td>
+                    <td>{$row['jumlah']}</td>
+                    <td>{$row['pembawa']}</td>
+                    <td>
+                        <a href='index.php?id={$row['id']}&kategori={$row['kategori']}&barang={$row['barang']}&jumlah={$row['jumlah']}&pembawa={$row['pembawa']}'>Edit</a> | 
+                        <a href='delete.php?id={$row['id']}' onclick='return confirm(\"Apakah Anda yakin ingin menghapus item ini?\")'>Hapus</a>
+                    </td>
+                  </tr>";
+        }
+    } else {
+        echo "<tr><td colspan='5'>Tidak ada data.</td></tr>";
+    }
+    ?>
+</table>
+
+</body>
+</html>
+
+
+<?php
+// Koneksi ke database SQLite
+$db = new PDO('sqlite:kontrakan_barang.db');
+
+// Cek apakah form di-submit
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Ambil data dari form
+    $id = $_POST['id'];
+    $kategori = $_POST['kategori'];
+    $barang = $_POST['barang'];
+    $jumlah = $_POST['jumlah'];
+    $pembawa = $_POST['pembawa'];
+
+    // Cek apakah ini adalah update atau insert
+    if ($id) {
+        // Update data
+        $query = "UPDATE kontrakan_barang SET kategori = :kategori, barang = :barang, jumlah = :jumlah, pembawa = :pembawa WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $id);
+    } else {
+        // Insert data
+        $query = "INSERT INTO kontrakan_barang (kategori, barang, jumlah, pembawa) VALUES (:kategori, :barang, :jumlah, :pembawa)";
+        $stmt = $db->prepare($query);
+    }
+
+    // Bind parameter dan eksekusi
+    $stmt->bindParam(':kategori', $kategori);
+    $stmt->bindParam(':barang', $barang);
+    $stmt->bindParam(':jumlah', $jumlah);
+    $stmt->bindParam(':pembawa', $pembawa);
+    $stmt->execute();
+
+    // Redirect kembali ke index.php
+    header("Location: index.php");
+    exit();
+}
+?>
+
+
+
+<?php
+// Koneksi ke database SQLite
+$db = new PDO('sqlite:kontrakan_barang.db');
+
+// Cek apakah ada ID yang dikirim
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    // Hapus data berdasarkan ID
+    $query = "DELETE FROM kontrakan_barang WHERE id = :id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+}
+
+// Redirect kembali ke index.php
+header("Location: index.php");
+exit();
+?>
