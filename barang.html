@@ -137,7 +137,7 @@
     </style>
 </head>
 <body>
-
+<button onclick="resetData()">Reset Data</button>
 <h2>Form Input Barang Kontrakan</h2>
 <form id="formBarang">
     <label for="kategori">Kategori:</label>
@@ -254,6 +254,11 @@
             tampilkanBarang();
         }
     };
+    function resetData() {
+    localStorage.removeItem("barangKontrakan"); // Hapus data dari localStorage
+    tambahDataAwal(); // Muat data awal
+    alert("Data telah direset ke kondisi awal.");
+}
 </script>
 
 </body>
