@@ -1,12 +1,183 @@
-<script>
-    let editIndex = null;  // Menyimpan index barang yang sedang diedit
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Barang Kontrakan</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-    // Fungsi untuk memuat data dari LocalStorage dan menampilkan di tabel
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Form Styles */
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #f9f9f9;
+        }
+
+        input:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+        }
+
+        td {
+            color: #555;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .btn-edit {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-edit:hover {
+            background-color: #218838;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            table, form {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h2>Form Input Barang Kontrakan</h2>
+<form id="formBarang">
+    <label for="kategori">Kategori:</label>
+    <input type="text" id="kategori" required>
+
+    <label for="barang">Barang:</label>
+    <input type="text" id="barang" required>
+
+    <label for="jumlah">Jumlah:</label>
+    <input type="number" id="jumlah" required>
+
+    <label for="pembawa">Pembawa:</label>
+    <input type="text" id="pembawa">
+
+    <button type="button" onclick="simpanBarang()">Simpan</button>
+</form>
+
+<h2>Daftar Barang Kontrakan</h2>
+<table id="tabelBarang">
+    <thead>
+        <tr>
+            <th>Kategori</th>
+            <th>Barang</th>
+            <th>Jumlah</th>
+            <th>Pembawa</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Data akan ditampilkan di sini -->
+    </tbody>
+</table>
+
+<script>
+    let editIndex = null;
+
     function tampilkanBarang() {
         const dataBarang = JSON.parse(localStorage.getItem("barangKontrakan")) || [];
-
         const tabel = document.getElementById("tabelBarang").getElementsByTagName("tbody")[0];
-        tabel.innerHTML = '';  // Bersihkan tabel
+        tabel.innerHTML = ''; 
 
         dataBarang.forEach((item, index) => {
             let row = tabel.insertRow();
@@ -16,14 +187,13 @@
                 <td>${item.jumlah}</td>
                 <td>${item.pembawa}</td>
                 <td>
-                    <button onclick="editBarang(${index})">Edit</button>
+                    <button class="btn-edit" onclick="editBarang(${index})">Edit</button>
                     <button class="btn-delete" onclick="hapusBarang(${index})">Hapus</button>
                 </td>
             `;
         });
     }
 
-    // Fungsi untuk menyimpan data barang ke LocalStorage
     function simpanBarang() {
         const kategori = document.getElementById("kategori").value;
         const barang = document.getElementById("barang").value;
@@ -34,87 +204,57 @@
             let dataBarang = JSON.parse(localStorage.getItem("barangKontrakan")) || [];
 
             if (editIndex !== null) {
-                // Jika sedang dalam mode edit, update data pada index tertentu
                 dataBarang[editIndex] = { kategori, barang, jumlah, pembawa };
-                editIndex = null; // Reset index setelah edit
+                editIndex = null;
             } else {
-                // Jika baru, tambahkan data baru
                 dataBarang.push({ kategori, barang, jumlah, pembawa });
             }
 
             localStorage.setItem("barangKontrakan", JSON.stringify(dataBarang));
-
-            // Reset form input
             document.getElementById("formBarang").reset();
-
-            // Tampilkan data setelah disimpan
             tampilkanBarang();
         } else {
             alert("Semua field harus diisi!");
         }
     }
 
-    // Fungsi untuk mengedit barang
     function editBarang(index) {
         const dataBarang = JSON.parse(localStorage.getItem("barangKontrakan"));
         const item = dataBarang[index];
 
-        // Set form dengan data yang ingin diedit
         document.getElementById("kategori").value = item.kategori;
         document.getElementById("barang").value = item.barang;
         document.getElementById("jumlah").value = item.jumlah;
         document.getElementById("pembawa").value = item.pembawa;
-
-        // Set editIndex untuk menandakan bahwa kita sedang mengedit data ini
         editIndex = index;
     }
 
-    // Fungsi untuk menghapus barang
     function hapusBarang(index) {
         const dataBarang = JSON.parse(localStorage.getItem("barangKontrakan"));
-        dataBarang.splice(index, 1); // Hapus data pada index tertentu
+        dataBarang.splice(index, 1);
         localStorage.setItem("barangKontrakan", JSON.stringify(dataBarang));
-        tampilkanBarang(); // Tampilkan data setelah dihapus
+        tampilkanBarang();
     }
 
-    // Menambahkan data awal ke LocalStorage
     function tambahDataAwal() {
         const dataBarangAwal = [
             { kategori: "Peralatan Memasak", barang: "Gas", jumlah: 1, pembawa: "Yogi" },
             { kategori: "Peralatan Memasak", barang: "Kompor", jumlah: 1, pembawa: "Maulana" },
-            { kategori: "Peralatan Memasak", barang: "Selang gas", jumlah: 1, pembawa: "Yogi" },
-            { kategori: "Peralatan Memasak", barang: "Langseng", jumlah: 1, pembawa: "" },
-            { kategori: "Peralatan Memasak", barang: "Panci", jumlah: 1, pembawa: "Nopal" },
-            { kategori: "Peralatan Memasak", barang: "Termos nasi", jumlah: 1, pembawa: "" },
-            { kategori: "Peralatan Memasak", barang: "Hihid", jumlah: 1, pembawa: "Nopal" },
-            { kategori: "Peralatan Makan (Per Orang)", barang: "Gelas", jumlah: 2, pembawa: "" },
-            { kategori: "Peralatan Makan (Per Orang)", barang: "Piring/mangkuk", jumlah: 3, pembawa: "" },
-            { kategori: "Peralatan Makan (Per Orang)", barang: "Sendok/garpu", jumlah: 3, pembawa: "" },
-            { kategori: "Perlengkapan Tidur dan Ruangan (Per Orang)", barang: "Karpet", jumlah: 1, pembawa: "" },
-            { kategori: "Perlengkapan Tidur dan Ruangan (Per Orang)", barang: "Kasur", jumlah: 1, pembawa: "" },
-            { kategori: "Perlengkapan Tidur dan Ruangan (Per Orang)", barang: "Bantal", jumlah: 1, pembawa: "" },
-            { kategori: "Peralatan Elektronik", barang: "Dispenser", jumlah: 1, pembawa: "Maulana" },
-            { kategori: "Peralatan Elektronik", barang: "Setrika", jumlah: 1, pembawa: "" },
-            { kategori: "Peralatan Elektronik", barang: "Mejikom", jumlah: 1, pembawa: "" },
-            { kategori: "Peralatan Elektronik", barang: "Terminal listrik", jumlah: 2, pembawa: "Irvan, Irgi, Nopal, Maulana" },
-            { kategori: "Peralatan Elektronik", barang: "Kipas angin", jumlah: 1, pembawa: "Nopal" },
-            { kategori: "Perlengkapan Lain (Per Orang)", barang: "Beras", jumlah: 5, pembawa: "" },
-            { kategori: "Perlengkapan Lain (Per Orang)", barang: "Galon air", jumlah: 2, pembawa: "Nopal" }
+            // Tambahkan data lain sesuai kebutuhan Anda
         ];
 
-        // Simpan data awal ke LocalStorage
         localStorage.setItem("barangKontrakan", JSON.stringify(dataBarangAwal));
-
-        // Tampilkan data setelah disimpan
         tampilkanBarang();
     }
 
-    // Muat data saat halaman dimuat
     window.onload = function() {
         if (!localStorage.getItem("barangKontrakan")) {
-            tambahDataAwal(); // Jika belum ada data di LocalStorage, tambah data awal
+            tambahDataAwal();
         } else {
-            tampilkanBarang(); // Jika sudah ada data, tampilkan
+            tampilkanBarang();
         }
     };
 </script>
+
+</body>
+</html>
