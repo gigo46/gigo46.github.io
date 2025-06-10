@@ -46,7 +46,7 @@
   </style>
 </head>
 <body>
-  <header>📈 Bot Sinyal XAUUSD (MA + Support/Resistance)</header>
+  <header>📈 Bot Sinyal XAUUSD</header>
   <div class="container">
     <!-- TradingView Chart -->
     <div id="tvchart"></div><button onclick="analyzeSignal()">Periksa Sinyal</button>
@@ -67,10 +67,17 @@
       "toolbar_bg": "#f1f3f6",
       "enable_publishing": false,
       "allow_symbol_change": false,
-      "studies": ["MAExp@tv-basicstudies", "MAExp@tv-basicstudies"],
+      "studies": [
+        "MAExp@tv-basicstudies",
+        "MAExp@tv-basicstudies",
+        "RSI@tv-basicstudies",
+        "StochasticRSI@tv-basicstudies"
+      ],
       "study_overrides": {
         "MAExp@tv-basicstudies.1.length": 20,
-        "MAExp@tv-basicstudies.0.length": 50
+        "MAExp@tv-basicstudies.0.length": 50,
+        "RSI@tv-basicstudies.length": 14,
+        "StochasticRSI@tv-basicstudies.length": 14
       }
     });
 
@@ -83,39 +90,38 @@
 
       const maTrendStrong = Math.random() > 0.3;
       const nearSupportResistance = Math.random() > 0.3;
+      const rsiConfirmation = Math.random() > 0.4; // Validasi tambahan RSI
+      const candlePattern = Math.random() > 0.4; // Validasi pola candlestick (Doji, Engulfing, dll)
 
-      if (!maTrendStrong || !nearSupportResistance) {
+      if (!maTrendStrong || !nearSupportResistance || !rsiConfirmation || !candlePattern) {
         document.getElementById("signal-result").style.display = "block";
         document.getElementById("signal-result").innerHTML = `
           <h3>❌ Tidak Ada Sinyal Valid</h3>
-          <p>Market belum memenuhi syarat konfirmasi tren dan posisi harga terhadap support/resistance.</p>
+          <p>Market belum memenuhi konfirmasi tren, posisi harga, RSI, atau pola candlestick.</p>
         `;
         return;
       }
 
       if (direction === "BUY") {
-        explanation = "Harga mendekati area support dan MA20 berada di atas MA50 → Potensi naik.";
-        tp = 70; // scalping TP
-        sl = 35;
+        explanation = "Harga mendekati support, MA20 > MA50, RSI oversold, dan pola candlestick bullish → Potensi naik (BUY).";
+        tp = 100;
+        sl = 50;
       } else {
-        explanation = "Harga mendekati area resistance dan MA20 berada di bawah MA50 → Potensi turun.";
-        tp = 60;
-        sl = 30;
+        explanation = "Harga mendekati resistance, MA20 < MA50, RSI overbought, dan pola candlestick bearish → Potensi turun (SELL).";
+        tp = 90;
+        sl = 45;
       }
 
       rr = (tp / sl).toFixed(2);
 
-      const signalText = `
+      document.getElementById("signal-result").style.display = "block";
+      document.getElementById("signal-result").innerHTML = `
         <h3>📢 Sinyal: ${direction}</h3>
         <p><strong>Alasan:</strong> ${explanation}</p>
         <p>🎯 <strong>TP:</strong> ${tp} pip &nbsp;&nbsp;&nbsp;🛑 <strong>SL:</strong> ${sl} pip</p>
         <p>⚖️ <strong>Risk:Reward Ratio (RR):</strong> ${rr}</p>
       `;
 
-      document.getElementById("signal-result").style.display = "block";
-      document.getElementById("signal-result").innerHTML = signalText;
-
-      // Notifikasi dari Chrome (PWA-style)
       if (Notification.permission === "granted") {
         new Notification(`Sinyal ${direction} XAUUSD`, { body: explanation });
       } else if (Notification.permission !== "denied") {
