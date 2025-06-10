@@ -37,26 +37,29 @@
       margin-top: 1rem;
     }
     footer {
-      margin-top: 2rem;
       text-align: center;
-      font-size: 12px;
-      color: #aaa;
+      padding: 1rem;
+      background: #f9f9f9;
+      font-size: 0.9rem;
+      color: #666;
     }
   </style>
 </head>
 <body>
-  <header>📈 Bot Sinyal XAUUSD (MA + RSI + Support/Resistance)</header>
+  <header>📈 Bot Sinyal XAUUSD (MA + Support/Resistance)</header>
   <div class="container">
     <!-- TradingView Chart -->
     <div id="tvchart"></div><button onclick="analyzeSignal()">Periksa Sinyal</button>
 <div id="signal-result" class="result" style="display:none"></div>
 
-  </div>  <!-- TradingView Widget -->  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>  <script type="text/javascript">
+  </div>  <footer>
+    © 2025 Gizz Trading Tools. All rights reserved.
+  </footer>  <!-- TradingView Widget -->  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>  <script type="text/javascript">
     new TradingView.widget({
       "container_id": "tvchart",
       "autosize": true,
       "symbol": "OANDA:XAUUSD",
-      "interval": "15",
+      "interval": "5",
       "timezone": "Etc/UTC",
       "theme": "light",
       "style": "1",
@@ -64,11 +67,10 @@
       "toolbar_bg": "#f1f3f6",
       "enable_publishing": false,
       "allow_symbol_change": false,
-      "studies": ["MAExp@tv-basicstudies", "RSI@tv-basicstudies", "MAExp@tv-basicstudies"],
+      "studies": ["MAExp@tv-basicstudies", "MAExp@tv-basicstudies"],
       "study_overrides": {
         "MAExp@tv-basicstudies.1.length": 20,
-        "MAExp@tv-basicstudies.0.length": 50,
-        "RSI@tv-basicstudies.length": 14
+        "MAExp@tv-basicstudies.0.length": 50
       }
     });
 
@@ -79,36 +81,41 @@
       let sl = 0;
       let rr = 0;
 
-      const rsi = Math.random() * 100; // Simulasi RSI
-      const ma20 = Math.random() * 100; // Simulasi MA20
-      const ma50 = Math.random() * 100; // Simulasi MA50
+      const maTrendStrong = Math.random() > 0.3;
+      const nearSupportResistance = Math.random() > 0.3;
 
-      // Logic for BUY/SELL
-      if (direction === "BUY" && rsi > 50 && ma20 > ma50) {
-        explanation = "Harga mendekati area support dan MA20 berada di atas MA50 → Potensi naik.";
-        tp = 300;
-        sl = 150;
-        rr = tp / sl;
-      } else if (direction === "SELL" && rsi < 50 && ma20 < ma50) {
-        explanation = "Harga mendekati area resistance dan MA20 berada di bawah MA50 → Potensi turun.";
-        tp = 250;
-        sl = 100;
-        rr = tp / sl;
-      } else {
-        explanation = "Sinyal tidak valid berdasarkan analisis RSI dan MA.";
-        tp = 0;
-        sl = 0;
-        rr = 0;
+      if (!maTrendStrong || !nearSupportResistance) {
+        document.getElementById("signal-result").style.display = "block";
+        document.getElementById("signal-result").innerHTML = `
+          <h3>❌ Tidak Ada Sinyal Valid</h3>
+          <p>Market belum memenuhi syarat konfirmasi tren dan posisi harga terhadap support/resistance.</p>
+        `;
+        return;
       }
 
-      document.getElementById("signal-result").style.display = "block";
-      document.getElementById("signal-result").innerHTML = `
+      if (direction === "BUY") {
+        explanation = "Harga mendekati area support dan MA20 berada di atas MA50 → Potensi naik.";
+        tp = 70; // scalping TP
+        sl = 35;
+      } else {
+        explanation = "Harga mendekati area resistance dan MA20 berada di bawah MA50 → Potensi turun.";
+        tp = 60;
+        sl = 30;
+      }
+
+      rr = (tp / sl).toFixed(2);
+
+      const signalText = `
         <h3>📢 Sinyal: ${direction}</h3>
         <p><strong>Alasan:</strong> ${explanation}</p>
-        <p>🎯 <strong>TP:</strong> ${tp} pip &nbsp;&nbsp;&nbsp;🛑 <strong>SL:</strong> ${sl} pip &nbsp;&nbsp;&nbsp;🔑 <strong>RR:</strong> ${rr}:1</p>
+        <p>🎯 <strong>TP:</strong> ${tp} pip &nbsp;&nbsp;&nbsp;🛑 <strong>SL:</strong> ${sl} pip</p>
+        <p>⚖️ <strong>Risk:Reward Ratio (RR):</strong> ${rr}</p>
       `;
 
-      // (opsional) kirim notifikasi jika diizinkan
+      document.getElementById("signal-result").style.display = "block";
+      document.getElementById("signal-result").innerHTML = signalText;
+
+      // Notifikasi dari Chrome (PWA-style)
       if (Notification.permission === "granted") {
         new Notification(`Sinyal ${direction} XAUUSD`, { body: explanation });
       } else if (Notification.permission !== "denied") {
@@ -119,6 +126,5 @@
         });
       }
     }
-  </script>  <footer>&copy; 2025 Gizz - Bot Sinyal XAUUSD</footer>
-</body>
+  </script></body>
 </html>
