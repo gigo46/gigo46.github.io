@@ -27,7 +27,7 @@
       padding: 1rem;
       margin-top: 1rem;
     }
-    button {
+    button, select {
       background: #ffcc00;
       border: none;
       padding: 10px 20px;
@@ -35,6 +35,7 @@
       cursor: pointer;
       border-radius: 8px;
       margin-top: 1rem;
+      display: inline-block;
     }
     footer {
       text-align: center;
@@ -46,40 +47,52 @@
   </style>
 </head>
 <body>
-  <header>📈 Bot Sinyal XAUUSD</header>
+  <header>📈 Bot Sinyal XAUUSD </header>
   <div class="container">
-    <!-- TradingView Chart -->
-    <div id="tvchart"></div><button onclick="analyzeSignal()">Periksa Sinyal</button>
+    <!-- Pilih Timeframe -->
+    <label for="timeframe">Pilih Timeframe:</label>
+    <select id="timeframe" onchange="updateChart()">
+      <option value="5">5 Menit (Scalping)</option>
+      <option value="15">15 Menit</option>
+      <option value="60">1 Jam</option>
+      <option value="240">4 Jam</option>
+      <option value="D">Harian</option>
+    </select><!-- TradingView Chart -->
+<div id="tvchart" style="height:500px;"></div>
+
+<button onclick="analyzeSignal()">Periksa Sinyal</button>
 <div id="signal-result" class="result" style="display:none"></div>
 
   </div>  <footer>
     © 2025 Gizz Trading Tools. All rights reserved.
   </footer>  <!-- TradingView Widget -->  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>  <script type="text/javascript">
-    new TradingView.widget({
-      "container_id": "tvchart",
-      "autosize": true,
-      "symbol": "OANDA:XAUUSD",
-      "interval": "5",
-      "timezone": "Etc/UTC",
-      "theme": "light",
-      "style": "1",
-      "locale": "en",
-      "toolbar_bg": "#f1f3f6",
-      "enable_publishing": false,
-      "allow_symbol_change": false,
-      "studies": [
-        "MAExp@tv-basicstudies",
-        "MAExp@tv-basicstudies",
-        "RSI@tv-basicstudies",
-        "StochasticRSI@tv-basicstudies"
-      ],
-      "study_overrides": {
-        "MAExp@tv-basicstudies.1.length": 20,
-        "MAExp@tv-basicstudies.0.length": 50,
-        "RSI@tv-basicstudies.length": 14,
-        "StochasticRSI@tv-basicstudies.length": 14
-      }
-    });
+    let widget;
+
+    function updateChart() {
+      const tf = document.getElementById("timeframe").value;
+      if (widget) widget.remove();
+      widget = new TradingView.widget({
+        container_id: "tvchart",
+        autosize: true,
+        symbol: "OANDA:XAUUSD",
+        interval: tf,
+        timezone: "Etc/UTC",
+        theme: "light",
+        style: "1",
+        locale: "en",
+        toolbar_bg: "#f1f3f6",
+        enable_publishing: false,
+        allow_symbol_change: false,
+        studies: ["MAExp@tv-basicstudies", "MAExp@tv-basicstudies", "RSI@tv-basicstudies"],
+        study_overrides: {
+          "MAExp@tv-basicstudies.1.length": 20,
+          "MAExp@tv-basicstudies.0.length": 50,
+          "RSI@tv-basicstudies.length": 14
+        }
+      });
+    }
+
+    updateChart(); // initial
 
     function analyzeSignal() {
       const direction = Math.random() > 0.5 ? "BUY" : "SELL";
@@ -87,29 +100,37 @@
       let tp = 0;
       let sl = 0;
       let rr = 0;
+      const currentPrice = 2300 + Math.random() * 20; // Simulasi harga XAUUSD
 
       const maTrendStrong = Math.random() > 0.3;
       const nearSupportResistance = Math.random() > 0.3;
-      const rsiConfirmation = Math.random() > 0.4; // Validasi tambahan RSI
-      const candlePattern = Math.random() > 0.4; // Validasi pola candlestick (Doji, Engulfing, dll)
+      const rsiValid = Math.random() > 0.3;
+      const candlePattern = Math.random() > 0.5 ? "Terbentuk pola Doji / Rejection (konfirmasi reversal)" : "Tidak ada pola candlestick yang kuat saat ini";
 
-      if (!maTrendStrong || !nearSupportResistance || !rsiConfirmation || !candlePattern) {
+      if (!maTrendStrong || !nearSupportResistance || !rsiValid) {
         document.getElementById("signal-result").style.display = "block";
         document.getElementById("signal-result").innerHTML = `
           <h3>❌ Tidak Ada Sinyal Valid</h3>
-          <p>Market belum memenuhi konfirmasi tren, posisi harga, RSI, atau pola candlestick.</p>
+          <p>Market belum memenuhi syarat konfirmasi tren, posisi harga terhadap support/resistance, atau RSI.</p>
         `;
         return;
       }
 
+      let entry = currentPrice.toFixed(2);
+      let slPrice, tpPrice;
+
       if (direction === "BUY") {
-        explanation = "Harga mendekati support, MA20 > MA50, RSI oversold, dan pola candlestick bullish → Potensi naik (BUY).";
-        tp = 100;
-        sl = 50;
+        explanation = `Harga mendekati area support, MA20 berada di atas MA50, RSI oversold → Potensi naik. ${candlePattern}`;
+        tp = 200;
+        sl = 100;
+        tpPrice = (currentPrice + tp * 0.1).toFixed(2);
+        slPrice = (currentPrice - sl * 0.1).toFixed(2);
       } else {
-        explanation = "Harga mendekati resistance, MA20 < MA50, RSI overbought, dan pola candlestick bearish → Potensi turun (SELL).";
-        tp = 90;
-        sl = 45;
+        explanation = `Harga mendekati area resistance, MA20 berada di bawah MA50, RSI overbought → Potensi turun. ${candlePattern}`;
+        tp = 180;
+        sl = 90;
+        tpPrice = (currentPrice - tp * 0.1).toFixed(2);
+        slPrice = (currentPrice + sl * 0.1).toFixed(2);
       }
 
       rr = (tp / sl).toFixed(2);
@@ -118,7 +139,8 @@
       document.getElementById("signal-result").innerHTML = `
         <h3>📢 Sinyal: ${direction}</h3>
         <p><strong>Alasan:</strong> ${explanation}</p>
-        <p>🎯 <strong>TP:</strong> ${tp} pip &nbsp;&nbsp;&nbsp;🛑 <strong>SL:</strong> ${sl} pip</p>
+        <p>💰 <strong>Entry:</strong> ${entry}</p>
+        <p>🎯 <strong>TP:</strong> ${tp} pip (${tpPrice}) &nbsp;&nbsp;&nbsp;🛑 <strong>SL:</strong> ${sl} pip (${slPrice})</p>
         <p>⚖️ <strong>Risk:Reward Ratio (RR):</strong> ${rr}</p>
       `;
 
