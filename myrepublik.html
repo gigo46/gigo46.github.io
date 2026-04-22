@@ -1,0 +1,164 @@
+<!DOCTYPE html><html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyRepublic Premium</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Poppins, sans-serif;
+  background:linear-gradient(135deg,#eef2ff,#fdf2f8);
+}header{ display:flex; justify-content:space-between; align-items:center; padding:15px 20px; }
+
+.logo{display:flex;align-items:center;gap:10px}
+
+h1{margin:0;font-size:20px}
+
+/* PLANET PREMIUM */ .planet-wrap{ position:relative; width:70px; height:70px; }
+
+.planet{ width:70px; animation:spin 8s linear infinite; border-radius:50%; box-shadow:0 0 20px rgba(147,51,234,0.6); }
+
+/* orbit ring */ .orbit{ position:absolute; top:0; left:0; width:70px; height:70px; border-radius:50%; border:2px solid rgba(147,51,234,0.4); animation:orbitSpin 6s linear infinite; }
+
+/* small satellite */ .satellite{ position:absolute; width:10px; height:10px; background:#ec4899; border-radius:50%; top:-5px; left:30px; box-shadow:0 0 10px #ec4899; }
+
+@keyframes spin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+@keyframes orbitSpin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+.hero{text-align:center;padding:20px} .hero h2{margin:0;font-size:26px} .hero span{color:#9333ea}
+
+.banner{ margin:15px; padding:15px; border-radius:15px; background:linear-gradient(90deg,#ff6a00,#ee0979); color:white; text-align:center; }
+
+.countdown{display:flex;justify-content:center;gap:10px;margin-top:10px} .time{background:white;color:black;padding:8px;border-radius:10px}
+
+.container{padding:15px}
+
+.card{ display:flex; justify-content:space-between; align-items:center; background:white; padding:15px; border-radius:15px; margin-bottom:10px; opacity:0; transform:translateY(20px); transition:0.5s; }
+
+.card.show{ opacity:1; transform:translateY(0); }
+
+.price{color:#9333ea;font-weight:bold}
+
+.btn{ padding:10px; border:none; border-radius:10px; background:linear-gradient(90deg,#9333ea,#ec4899); color:white; }
+
+.modal{ position:fixed; top:0;left:0; width:100%;height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; }
+
+.modal-content{ background:white; padding:20px; border-radius:15px; width:90%;max-width:350px; }
+
+input,textarea{ width:100%; padding:10px; margin:5px 0; border-radius:8px; border:1px solid #ddd; }
+
+.btn-group{display:flex;gap:10px}
+
+.success{display:none;text-align:center;color:green} .check{font-size:30px;animation:pop 0.5s}
+
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}} </style>
+
+</head>
+<body><header>
+  <div class="logo">
+    <h1>MyRepublic</h1>
+    <div class="planet-wrap">
+      <img src="https://cdn-icons-png.flaticon.com/512/3212/3212608.png" class="planet">
+      <div class="orbit">
+        <div class="satellite"></div>
+      </div>
+    </div>
+  </div>
+</header><div class="hero">
+  <h2>Internet Cepat,<br><span>Tanpa Batas!</span></h2>
+</div><div class="banner">
+🔥 PROMO TERBATAS
+<div class="countdown">
+  <div class="time" id="jam"></div>
+  <div class="time" id="menit"></div>
+  <div class="time" id="detik"></div>
+</div>
+</div><div class="container" id="paket-list"></div><div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Lengkapi Data</h3>
+    <input id="nama" placeholder="Nama Lengkap">
+    <input id="nohp" placeholder="No HP">
+    <textarea id="alamat" placeholder="Alamat Lengkap"></textarea><div class="btn-group">
+  <button class="btn" onclick="ambilLokasi()">📍</button>
+  <button class="btn" onclick="kirimWA()">Kirim</button>
+</div>
+
+<div class="success" id="success">
+  <div class="check">✔</div>
+  Lokasi berhasil diambil!
+</div>
+
+  </div>
+</div><script>
+const nomorWA="62881023475404";
+let paketDipilih=null;
+let lokasi="belum";
+
+const paket=[
+ {nama:"Ring",speed:"10 Mbps",harga:"110.000"},
+ {nama:"Eco",speed:"20 Mbps",harga:"150.000"},
+ {nama:"Neo",speed:"100 Mbps",harga:"233.100"},
+ {nama:"Velo",speed:"300 Mbps",harga:"277.500"},
+ {nama:"Nexus",speed:"400 Mbps",harga:"333.000"},
+ {nama:"MyGamer",speed:"350 Mbps",harga:"444.000"},
+ {nama:"Prime",speed:"500 Mbps",harga:"555.000"}
+];
+
+const container=document.getElementById("paket-list");
+paket.forEach((p,i)=>{
+ container.innerHTML+=`
+ <div class="card">
+   <div>
+     <b>${p.nama}</b><br>
+     ${p.speed}<br>
+     <div class="price">Rp${p.harga}</div>
+   </div>
+   <button class="btn" onclick="openModal('${p.nama}','${p.speed}','${p.harga}')">Pesan</button>
+ </div>`;
+});
+
+window.addEventListener('scroll',()=>{
+ document.querySelectorAll('.card').forEach(el=>{
+  const top=el.getBoundingClientRect().top;
+  if(top<window.innerHeight-50){
+    el.classList.add('show');
+  }
+ });
+});
+
+function openModal(n,s,h){
+ paketDipilih={n,s,h};
+ modal.style.display="flex";
+}
+
+function ambilLokasi(){
+ navigator.geolocation.getCurrentPosition(pos=>{
+  lokasi=`https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+  document.getElementById("success").style.display="block";
+ });
+}
+
+function kirimWA(){
+ const nama=document.getElementById("nama").value;
+ const alamat=document.getElementById("alamat").value;
+ if(!nama||!alamat)return alert("isi dulu bro");
+
+ const pesan=`Pesan ${paketDipilih.n}\nNama:${nama}\nAlamat:${alamat}\nLokasi:${lokasi}`;
+ window.open(`https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`);
+}
+
+let total=3600;
+setInterval(()=>{
+ total--;
+ let h=Math.floor(total/3600);
+ let m=Math.floor((total%3600)/60);
+ let s=total%60;
+ document.getElementById('jam').innerText=h;
+ document.getElementById('menit').innerText=m;
+ document.getElementById('detik').innerText=s;
+ if(total<=0) total=3600;
+},1000);
+</script></body>
+</html>
