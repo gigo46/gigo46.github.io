@@ -2,30 +2,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyRepublic Premium</title>
+<title>MyRepublic Premium UI</title>
 <style>
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:Poppins, sans-serif;
   background:linear-gradient(135deg,#eef2ff,#fdf2f8);
-}header{ display:flex; justify-content:space-between; align-items:center; padding:15px 20px; }
+  overflow-x:hidden;
+}/* STAR BACKGROUND */ body::before{ content:""; position:fixed; width:200%; height:200%; background:url('https://www.transparenttextures.com/patterns/stardust.png'); opacity:0.3; animation:stars 60s linear infinite; }
 
-.logo{display:flex;align-items:center;gap:10px}
+@keyframes stars{ from{transform:translate(0,0)} to{transform:translate(-500px,-500px)} }
 
-h1{margin:0;font-size:20px}
+header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px} .logo{display:flex;align-items:center;gap:10px} h1{margin:0;font-size:20px}
 
-/* PLANET PREMIUM */ .planet-wrap{ position:relative; width:70px; height:70px; }
+/* PLANET */ .planet-wrap{position:relative;width:70px;height:70px} .planet{width:70px;animation:spin 8s linear infinite;border-radius:50%;box-shadow:0 0 20px rgba(147,51,234,0.6)} .orbit{position:absolute;top:0;left:0;width:70px;height:70px;border-radius:50%;border:2px solid rgba(147,51,234,0.4);animation:orbitSpin 6s linear infinite} .satellite{position:absolute;width:10px;height:10px;background:#ec4899;border-radius:50%;top:-5px;left:30px;box-shadow:0 0 10px #ec4899}
 
-.planet{ width:70px; animation:spin 8s linear infinite; border-radius:50%; box-shadow:0 0 20px rgba(147,51,234,0.6); }
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}} @keyframes orbitSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 
-/* orbit ring */ .orbit{ position:absolute; top:0; left:0; width:70px; height:70px; border-radius:50%; border:2px solid rgba(147,51,234,0.4); animation:orbitSpin 6s linear infinite; }
+/* ROCKET FLOAT */ .rocket{ position:fixed; bottom:20px; right:-100px; width:60px; animation:fly 12s linear infinite; }
 
-/* small satellite */ .satellite{ position:absolute; width:10px; height:10px; background:#ec4899; border-radius:50%; top:-5px; left:30px; box-shadow:0 0 10px #ec4899; }
-
-@keyframes spin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-
-@keyframes orbitSpin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes fly{ 0%{right:-100px;bottom:50px} 50%{right:50%;bottom:150px} 100%{right:110%;bottom:80px} }
 
 .hero{text-align:center;padding:20px} .hero h2{margin:0;font-size:26px} .hero span{color:#9333ea}
 
@@ -37,23 +34,29 @@ h1{margin:0;font-size:20px}
 
 .card{ display:flex; justify-content:space-between; align-items:center; background:white; padding:15px; border-radius:15px; margin-bottom:10px; opacity:0; transform:translateY(20px); transition:0.5s; }
 
-.card.show{ opacity:1; transform:translateY(0); }
+.card.show{opacity:1;transform:translateY(0)}
+
+.card:hover{box-shadow:0 0 15px rgba(147,51,234,0.4)}
+
+.badge{ background:#ec4899; color:white; font-size:10px; padding:3px 6px; border-radius:8px; margin-left:5px; }
 
 .price{color:#9333ea;font-weight:bold}
 
-.btn{ padding:10px; border:none; border-radius:10px; background:linear-gradient(90deg,#9333ea,#ec4899); color:white; }
+.btn{ padding:10px; border:none; border-radius:10px; background:linear-gradient(90deg,#9333ea,#ec4899); color:white; cursor:pointer; }
 
-.modal{ position:fixed; top:0;left:0; width:100%;height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; }
+.btn:hover{box-shadow:0 0 10px #9333ea}
 
-.modal-content{ background:white; padding:20px; border-radius:15px; width:90%;max-width:350px; }
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center} .modal-content{background:white;padding:20px;border-radius:15px;width:90%;max-width:350px}
 
-input,textarea{ width:100%; padding:10px; margin:5px 0; border-radius:8px; border:1px solid #ddd; }
+input,textarea{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ddd}
 
 .btn-group{display:flex;gap:10px}
 
 .success{display:none;text-align:center;color:green} .check{font-size:30px;animation:pop 0.5s}
 
-@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}} </style>
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+
+/* fake notif */ .notif{ position:fixed; bottom:20px; left:20px; background:white; padding:10px; border-radius:10px; box-shadow:0 5px 10px rgba(0,0,0,0.1); display:none; } </style>
 
 </head>
 <body><header>
@@ -61,12 +64,10 @@ input,textarea{ width:100%; padding:10px; margin:5px 0; border-radius:8px; borde
     <h1>MyRepublic</h1>
     <div class="planet-wrap">
       <img src="https://cdn-icons-png.flaticon.com/512/3212/3212608.png" class="planet">
-      <div class="orbit">
-        <div class="satellite"></div>
-      </div>
+      <div class="orbit"><div class="satellite"></div></div>
     </div>
   </div>
-</header><div class="hero">
+</header><img src="https://cdn-icons-png.flaticon.com/512/3212/3212608.png" class="rocket"><div class="hero">
   <h2>Internet Cepat,<br><span>Tanpa Batas!</span></h2>
 </div><div class="banner">
 🔥 PROMO TERBATAS
@@ -91,7 +92,7 @@ input,textarea{ width:100%; padding:10px; margin:5px 0; border-radius:8px; borde
 </div>
 
   </div>
-</div><script>
+</div><div class="notif" id="notif">Andi baru saja pesan paket Neo 🔥</div><script>
 const nomorWA="62881023475404";
 let paketDipilih=null;
 let lokasi="belum";
@@ -99,7 +100,7 @@ let lokasi="belum";
 const paket=[
  {nama:"Ring",speed:"10 Mbps",harga:"110.000"},
  {nama:"Eco",speed:"20 Mbps",harga:"150.000"},
- {nama:"Neo",speed:"100 Mbps",harga:"233.100"},
+ {nama:"Neo",speed:"100 Mbps",harga:"233.100",best:true},
  {nama:"Velo",speed:"300 Mbps",harga:"277.500"},
  {nama:"Nexus",speed:"400 Mbps",harga:"333.000"},
  {nama:"MyGamer",speed:"350 Mbps",harga:"444.000"},
@@ -107,11 +108,11 @@ const paket=[
 ];
 
 const container=document.getElementById("paket-list");
-paket.forEach((p,i)=>{
+paket.forEach(p=>{
  container.innerHTML+=`
  <div class="card">
    <div>
-     <b>${p.nama}</b><br>
+     <b>${p.nama} ${p.best?'<span class="badge">POPULER</span>':''}</b><br>
      ${p.speed}<br>
      <div class="price">Rp${p.harga}</div>
    </div>
@@ -122,16 +123,11 @@ paket.forEach((p,i)=>{
 window.addEventListener('scroll',()=>{
  document.querySelectorAll('.card').forEach(el=>{
   const top=el.getBoundingClientRect().top;
-  if(top<window.innerHeight-50){
-    el.classList.add('show');
-  }
+  if(top<window.innerHeight-50){el.classList.add('show');}
  });
 });
 
-function openModal(n,s,h){
- paketDipilih={n,s,h};
- modal.style.display="flex";
-}
+function openModal(n,s,h){paketDipilih={n,s,h};modal.style.display="flex"}
 
 function ambilLokasi(){
  navigator.geolocation.getCurrentPosition(pos=>{
@@ -144,21 +140,22 @@ function kirimWA(){
  const nama=document.getElementById("nama").value;
  const alamat=document.getElementById("alamat").value;
  if(!nama||!alamat)return alert("isi dulu bro");
-
  const pesan=`Pesan ${paketDipilih.n}\nNama:${nama}\nAlamat:${alamat}\nLokasi:${lokasi}`;
  window.open(`https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`);
 }
 
 let total=3600;
 setInterval(()=>{
- total--;
- let h=Math.floor(total/3600);
- let m=Math.floor((total%3600)/60);
- let s=total%60;
- document.getElementById('jam').innerText=h;
- document.getElementById('menit').innerText=m;
- document.getElementById('detik').innerText=s;
+ total--;let h=Math.floor(total/3600);let m=Math.floor((total%3600)/60);let s=total%60;
+ jam.innerText=h;menit.innerText=m;detik.innerText=s;
  if(total<=0) total=3600;
 },1000);
+
+// fake notif
+setInterval(()=>{
+ const notif=document.getElementById('notif');
+ notif.style.display='block';
+ setTimeout(()=>notif.style.display='none',4000);
+},8000);
 </script></body>
 </html>
